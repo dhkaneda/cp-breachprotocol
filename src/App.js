@@ -8,12 +8,16 @@ import DaemonList from './components/daemon-list/daemon-list';
 
 function App() {
   return (
-    <div className="App">
+    <div>
       <Header />
-      <Timer />
-      <Buffer />
-      <Matrix />
-      <DaemonList />
+      <div className="status">
+        <Timer />
+        <Buffer />
+      </div>
+      <div className="interface">
+        <Matrix />
+        <DaemonList />
+      </div>
     </div>
   );
 }

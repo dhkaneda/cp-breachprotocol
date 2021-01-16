@@ -6,3 +6,11 @@ nav {
   width: 100%;
   background: gray;
 }
+
+.status {
+  display: flex;
+}
+
+.interface {
+  display: flex;
+}
