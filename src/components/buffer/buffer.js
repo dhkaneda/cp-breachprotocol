@@ -2,7 +2,7 @@ import React from 'react';
 
 const Buffer = () => {
   return (
-    <div>
+    <div className="main-right">
       Buffer
     </div>
   )

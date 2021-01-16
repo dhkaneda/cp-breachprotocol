@@ -10,9 +10,32 @@ nav {
 .status {
   display: flex;
   padding: 10px;
+  justify-content: space-between;
 }
 
 .interface {
   display: flex;
   padding: 10px;
+  justify-content: space-between;
+}
+
+.main-left {
+  flex: 2;
+  padding-right: 10px;
+}
+
+.main-right {
+  flex: 3;
+  padding-left: 10px;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.space-between {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
