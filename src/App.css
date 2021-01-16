@@ -2,15 +2,17 @@ nav {
   position: static;
   top: 0;
   left: 0;
-  padding: 20px;
+  padding: 10px;
   width: 100%;
   background: gray;
 }
 
 .status {
   display: flex;
+  padding: 10px;
 }
 
 .interface {
   display: flex;
+  padding: 10px;
 }
