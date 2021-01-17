@@ -5,21 +5,19 @@ const Matrix = ({ matrix }) => {
     <div className="main-left">
       <table className="center">
         <thead>
-          <tr>
-            {matrix.map((row) => {
-              return (
-                <tr>
-                  {
-                    row.map((byte) => {
+          {matrix.map((row, index) => {
+            return (
+              <tr key={index}>
+                {
+                  row.map((byte, index) => {
                     return (
-                      <th>{byte}</th>
+                      <th key={index}>{byte}</th>
                     )
-                    })
-                  }
-                </tr>
-              )
-            })}
-          </tr>
+                  })
+                }
+              </tr>
+            )
+          })}
         </thead>
       </table>
     </div>
