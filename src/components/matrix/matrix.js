@@ -1,44 +1,26 @@
 import React from 'react';
 
-const Matrix = () => {
+const Matrix = ({ matrix }) => {
   return (
     <div className="main-left">
       <table className="center">
-        <tr>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-        </tr>
-        <tr>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-        </tr>
-        <tr>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-        </tr>
-        <tr>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-        </tr>
-        <tr>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-          <th>00</th>
-        </tr>
+        <thead>
+          <tr>
+            {matrix.map((row) => {
+              return (
+                <tr>
+                  {
+                    row.map((byte) => {
+                    return (
+                      <th>{byte}</th>
+                    )
+                    })
+                  }
+                </tr>
+              )
+            })}
+          </tr>
+        </thead>
       </table>
     </div>
   )
