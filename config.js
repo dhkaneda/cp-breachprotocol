@@ -1,6 +1,5 @@
 export const config = {
   byteRange: ['BD', 'E9', '55', '1C', '7A'],
-  maxBufferSize: 8,
   matrixSize: 5,
   possibleDaemons: [
     "Mass Vulnerability",
