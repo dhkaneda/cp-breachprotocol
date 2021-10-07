@@ -2,6 +2,7 @@
   "name": "cp-breachprotocol",
   "version": "1.0.0",
   "description": "a clone of the CP2077 mini-game Breach Protocol",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "test": "jest"
