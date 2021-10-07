@@ -4,4 +4,4 @@ const matrix = new BreachProtocol();
 
 matrix.init();
 
-console.log(matrix);
+console.log(JSON.stringify(matrix, null, 2));
