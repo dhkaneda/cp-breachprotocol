@@ -7,9 +7,9 @@ const { matrixSize, byteRange } = config;
 const bufferKeys = Object.keys(config.bufferKey);
 const randomBufferKeyIndex = selectRandomFrom(bufferKeys);
 const bufferParams = selectRandomFrom(config.bufferKey[randomBufferKeyIndex]);
+const possibleDaemons = config.possibleDaemons;
 
-
-const matrix = new BreachProtocol(matrixSize, byteRange, bufferParams);
+const matrix = new BreachProtocol(matrixSize, byteRange, bufferParams, possibleDaemons);
 
 matrix.init();
 
