@@ -1,6 +1,32 @@
-import { selectRandomFrom, shuffleArray } from "../utils.js";
-export class BreachProtocol {
-  constructor(matrixSize = 5, byteRange, bufferParams, possibleDaemons) {
+import { selectRandomFrom, shuffleArray } from '@/lib/utils';
+
+interface ByteChar {
+  visited: boolean;
+  byteChars: string;
+}
+
+interface BufferParams {
+  size: number;
+  subSequence: [number, number][];
+}
+
+interface DaemonSequence {
+  name: string;
+  sequence: string[];
+}
+
+export default class BreachProtocol {
+  bufferParams: BufferParams;
+  byteRange: string[];
+  maxBufferSize: number;
+  matrixSize: number;
+  matrix: ByteChar[][];
+  displayMatrix: string[][];
+  possibleDaemons: string[];
+  possibleSequence: string[];
+  daemonSequences: DaemonSequence[];
+
+  constructor(matrixSize = 5, byteRange: string[], bufferParams: BufferParams, possibleDaemons: string[]) {
     this.bufferParams = bufferParams;
     this.byteRange = byteRange;
     this.maxBufferSize = this.bufferParams.size;
@@ -20,21 +46,23 @@ export class BreachProtocol {
   }
 
   generateMatrix() {
-    this.matrix = Array.from({ length: this.matrixSize }, () => {
+    this.displayMatrix = Array.from({ length: this.matrixSize }, () => {
       return Array.from({ length: this.matrixSize }, () =>
         selectRandomFrom(this.byteRange)
       );
     });
-    this.displayMatrix = this.matrix;
   }
 
   formatMatrixForTraversal() {
-    this.matrix = this.matrix.map((byteRow) =>
-      byteRow.map((byteChars) => ({ visited: false, byteChars }))
+    this.matrix = this.displayMatrix.map((byteRow) =>
+      byteRow.map((byte) => ({
+        visited: false,
+        byteChars: byte,
+      }))
     );
   }
 
-  traverseColumnForNextChar(pickedColumnIndex) {
+  traverseColumnForNextChar(pickedColumnIndex: number) : {pickedRowIndex: number, byteChars: string} {
     // selects random byte from unvisited rows in selected column
     const unvisitedRows = this.matrix.filter(
       (row) => !row[pickedColumnIndex].visited
@@ -50,7 +78,7 @@ export class BreachProtocol {
     };
   }
 
-  traverseRowForNextChar(pickedRowIndex = 0) {
+  traverseRowForNextChar(pickedRowIndex : number = 0) : {pickedColumnIndex: number, byteChars: string} {
     const unvisitedBytes = this.matrix[pickedRowIndex].filter(
       (byte) => !byte.visited
     );
@@ -66,11 +94,11 @@ export class BreachProtocol {
   generatePossibleSequence() {
     let traversalCount = 0;
 
-    const traverse = (pickedIndex, checkRow) => {
+    const traverse = (pickedIndex: number, checkRow: boolean) => {
       const getNextChar = checkRow
-        ? this.traverseRowForNextChar
-        : this.traverseColumnForNextChar;
-      const chosenByte = getNextChar.call(this, pickedIndex);
+        ? this.traverseRowForNextChar.bind(this)
+        : this.traverseColumnForNextChar.bind(this);
+      const chosenByte = getNextChar(pickedIndex);
       this.possibleSequence.push(chosenByte.byteChars);
       traversalCount += 1;
       if (traversalCount < this.maxBufferSize) {
