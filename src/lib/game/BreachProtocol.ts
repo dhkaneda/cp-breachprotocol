@@ -65,6 +65,9 @@ export default class BreachProtocol {
   }
 
   generateMatrix() {
+    if (!this.byteRange || this.byteRange.length === 0) {
+      throw new Error('byteRange cannot be empty');
+    }
     this.displayMatrix = Array.from({ length: this.matrixSize }, () => {
       return Array.from({ length: this.matrixSize }, () =>
         selectRandomFrom(this.byteRange)
@@ -81,13 +84,12 @@ export default class BreachProtocol {
     );
   }
 
-  traverseColumnForNextChar(pickedColumnIndex: number) : {pickedRowIndex: number, byteChars: string} {
+  traverseColumnForNextChar(pickedColumnIndex: number): { pickedRowIndex: number, byteChars: string } | null {
     // selects random byte from unvisited rows in selected column
     const unvisitedRows = this.matrix.filter(
       (row) => !row[pickedColumnIndex].visited
     );
-    const randomRow =
-      unvisitedRows[Math.floor(Math.random() * unvisitedRows.length)];
+    const randomRow = selectRandomFrom(unvisitedRows);
     const randomByte = randomRow[pickedColumnIndex];
     randomByte.visited = true;
 
@@ -97,7 +99,7 @@ export default class BreachProtocol {
     };
   }
 
-  traverseRowForNextChar(pickedRowIndex : number = 0) : {pickedColumnIndex: number, byteChars: string} {
+  traverseRowForNextChar(pickedRowIndex: number = 0): { pickedColumnIndex: number, byteChars: string } | null {
     const unvisitedBytes = this.matrix[pickedRowIndex].filter(
       (byte) => !byte.visited
     );
@@ -114,16 +116,26 @@ export default class BreachProtocol {
     let traversalCount = 0;
 
     const traverse = (pickedIndex: number, checkRow: boolean) => {
+      if (this.possibleSequence.length >= this.maxBufferSize) {
+        return;
+      }
       const getNextChar = checkRow
         ? this.traverseRowForNextChar.bind(this)
         : this.traverseColumnForNextChar.bind(this);
       const chosenByte = getNextChar(pickedIndex);
+      if (!chosenByte) {
+        // No more unvisited bytes/rows; end sequence early
+        return;
+      }
       this.possibleSequence.push(chosenByte.byteChars);
       traversalCount += 1;
+      if (this.possibleSequence.length >= this.maxBufferSize) {
+        return;
+      }
       if (traversalCount < this.maxBufferSize) {
         const nextIndex = checkRow
-          ? chosenByte.pickedColumnIndex
-          : chosenByte.pickedRowIndex;
+          ? (chosenByte as { pickedColumnIndex: number }).pickedColumnIndex
+          : (chosenByte as { pickedRowIndex: number }).pickedRowIndex;
         traverse(nextIndex, !checkRow);
       }
     };
@@ -133,22 +145,33 @@ export default class BreachProtocol {
 
   generateDaemonSequences() {
     // Generate daemon sequences
-    this.daemonSequences = this.bufferParams.subSequence.map(
-      ([startingIndex, sequenceLength]) => {
-        const [removedRandomDaemon] = this.possibleDaemons.splice(selectRandomFrom([...Array(this.possibleDaemons.length).keys()]), 1);
-
+    const usedNames = new Set<string>();
+    this.daemonSequences = [];
+    for (const [startingIndex, sequenceLength] of this.bufferParams.subSequence) {
+      // Only generate if the slice is valid and non-empty
+      if (
+        startingIndex >= 0 &&
+        startingIndex < this.possibleSequence.length &&
+        sequenceLength > 0 &&
+        startingIndex + sequenceLength <= this.possibleSequence.length
+      ) {
+        // Pick a random, unused daemon name
+        let availableNames = this.possibleDaemons.filter((d) => !usedNames.has(d));
+        if (availableNames.length === 0) break;
+        const removedRandomDaemon = selectRandomFrom(availableNames);
+        usedNames.add(removedRandomDaemon);
         const sequence = this.possibleSequence.slice(
           startingIndex,
           startingIndex + sequenceLength
         );
-
-        return {
-          name: removedRandomDaemon,
-          sequence,
-        };
+        if (sequence.length > 0) {
+          this.daemonSequences.push({
+            name: removedRandomDaemon,
+            sequence,
+          });
+        }
       }
-    );
-
+    }
     shuffleArray(this.daemonSequences);
   }
 }
