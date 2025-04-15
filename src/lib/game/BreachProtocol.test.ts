@@ -33,14 +33,40 @@ describe('BreachProtocol core methods', () => {
 
   it('traverseRowForNextChar marks a byte as visited', () => {
     const rowIdx = 0;
-    const { pickedColumnIndex } = game.traverseRowForNextChar(rowIdx);
-    expect(game.matrix[rowIdx][pickedColumnIndex].visited).toBe(true);
+    const result = game.traverseRowForNextChar(rowIdx);
+    expect(result).not.toBeNull();
+    if (result) {
+      expect(game.matrix[rowIdx][result.pickedColumnIndex].visited).toBe(true);
+    }
   });
 
   it('traverseColumnForNextChar marks a byte as visited', () => {
     const colIdx = 0;
-    const { pickedRowIndex } = game.traverseColumnForNextChar(colIdx);
-    expect(game.matrix[pickedRowIndex][colIdx].visited).toBe(true);
+    const result = game.traverseColumnForNextChar(colIdx);
+    expect(result).not.toBeNull();
+    if (result) {
+      expect(game.matrix[result.pickedRowIndex][colIdx].visited).toBe(true);
+    }
+  });
+
+  it('traverseColumnForNextChar returns null if all rows in column are visited', () => {
+    game.generateMatrix();
+    game.formatMatrixForTraversal();
+    // Mark all cells in column 0 as visited
+    for (let i = 0; i < game.matrixSize; i++) {
+      game.matrix[i][0].visited = true;
+    }
+    expect(game.traverseColumnForNextChar(0)).toBeNull();
+  });
+
+  it('traverseRowForNextChar returns null if all bytes in row are visited', () => {
+    game.generateMatrix();
+    game.formatMatrixForTraversal();
+    // Mark all cells in row 0 as visited
+    for (let j = 0; j < game.matrixSize; j++) {
+      game.matrix[0][j].visited = true;
+    }
+    expect(game.traverseRowForNextChar(0)).toBeNull();
   });
 
   it('generatePossibleSequence fills possibleSequence correctly', () => {
@@ -49,6 +75,16 @@ describe('BreachProtocol core methods', () => {
     game.possibleSequence.forEach(byte => {
       expect(config.byteRange).toContain(byte);
     });
+  });
+
+  it('ends sequence generation early if matrix is exhausted', () => {
+    // 2x2 matrix, buffer size 10 (more than possible unique picks)
+    const testParams: BufferParams = { size: 10, subSequence: [[0, 10]] };
+    const smallConfig = { ...config, matrixSize: 2 };
+    const game = new BreachProtocol(smallConfig, testParams);
+    game.init();
+    // The sequence should be at most 4 (the number of cells in the matrix)
+    expect(game.possibleSequence.length).toBeLessThanOrEqual(4);
   });
 
   it('generateDaemonSequences creates unique daemon names', () => {
