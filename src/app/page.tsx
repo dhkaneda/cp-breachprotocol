@@ -1,16 +1,7 @@
-import BreachProtocol from '@/lib/game/BreachProtocol';
-import { selectRandomFrom } from '@/lib/utils';
 import { config } from '@/lib/config';
+import BreachProtocol from '@/lib/game/BreachProtocol';
 
-const { matrixSize, byteRange, bufferKey } = config;
-
-const bufferKeys = Object.keys(bufferKey);
-const randomBufferKeyIndex = selectRandomFrom(bufferKeys);
-const bufferParams = selectRandomFrom(bufferKey[randomBufferKeyIndex]);
-const possibleDaemons = config.possibleDaemons;
-
-const matrix = new BreachProtocol(matrixSize, byteRange, bufferParams, possibleDaemons);
-
+const matrix = new BreachProtocol(config);
 matrix.init();
 
 console.dir(matrix, { depth: null });

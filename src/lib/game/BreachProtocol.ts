@@ -26,10 +26,29 @@ export default class BreachProtocol {
   possibleSequence: string[];
   daemonSequences: DaemonSequence[];
 
-  constructor(matrixSize = 5, byteRange: string[], bufferParams: BufferParams, possibleDaemons: string[]) {
-    this.bufferParams = bufferParams;
+  constructor(
+    config: {
+      matrixSize: number;
+      byteRange: string[];
+      bufferKey: Record<number, BufferParams[]>;
+      possibleDaemons: string[];
+    },
+    bufferParams?: BufferParams
+  ) {
+    const { matrixSize, byteRange, bufferKey, possibleDaemons } = config;
+    let chosenBufferParams = bufferParams;
+    if (!chosenBufferParams) {
+      const bufferKeyKeys = Object.keys(bufferKey).map(Number); // ensure keys are numbers
+      const randomKey = selectRandomFrom(bufferKeyKeys);
+      const bufferParamsArray = bufferKey[randomKey];
+      if (!bufferParamsArray || bufferParamsArray.length === 0) {
+        throw new Error('No bufferParams available for the selected key');
+      }
+      chosenBufferParams = selectRandomFrom(bufferParamsArray);
+    }
+    this.bufferParams = chosenBufferParams!;
     this.byteRange = byteRange;
-    this.maxBufferSize = this.bufferParams.size;
+    this.maxBufferSize = chosenBufferParams!.size;
     this.matrixSize = matrixSize;
     this.matrix = [];
     this.displayMatrix = [];
